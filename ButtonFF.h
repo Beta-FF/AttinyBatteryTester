@@ -5,9 +5,9 @@
 #define NOT_PRESS       HIGH
 #define TICKS_PER_HOLD  20
 
-class uButtonFF {
+class ButtonFF {
 public:
-    uButtonFF(uint8_t pin, uint8_t mode = INPUT_PULLUP) {
+    ButtonFF(uint8_t pin, uint8_t mode = INPUT_PULLUP) {
         pinMode(pin, mode);
         _pin = pin;
     }

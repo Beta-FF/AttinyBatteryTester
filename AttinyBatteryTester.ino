@@ -3,7 +3,7 @@
 #include "NanoOLED.h"
 #include "GyverINA.h"
 #include "TimerFF.h"
-#include "uButtonFF.h"
+#include "ButtonFF.h"
 
 #define FW_VER "1.0"
 
@@ -25,9 +25,9 @@
 
 NanoOLED oled;
 INA219 ina;
-uButtonFF start_rst(15);
-uButtonFF U_inc(PIN_A6);
-uButtonFF U_dec(16);
+ButtonFF start_rst(15);
+ButtonFF U_inc(PIN_A6);
+ButtonFF U_dec(16);
 
 TimerFF task100ms(100);
 TimerFF task50ms(50);
@@ -228,7 +228,7 @@ void bootup_screen() {
     oled.print(F("Battery Tester"));
     //oled.setScale(1);
     oled.setCursor(0, 7);
-    oled.print(F("BetaFF    fw_ver: "));
+    oled.print(F("BetaFF         v: "));
     oled.print(F(FW_VER));
     delay(2000);
     oled.clearDisplay();
