@@ -1,7 +1,5 @@
 # Attiny Battery Tester
 
-![pic](pics/interface.jpg)
-
 Простой тестер емкости аккумуляторов на Attiny88 и INA219  
 Используется:  
 [ATTinyCore](https://github.com/SpenceKonde/ATTinyCore)  
@@ -11,12 +9,14 @@
 TimerFF (многозадачность на millis())  
 ButtonFF (обработка нажатия и удержание кнопки)  
 
-"START/RESET" - Запуск и пауза замера, долгое удержание - сброс
-"U+" и "U-" - настройка минимального напряжения разряд
+<img src="pics/interface.jpg" alt="interface" style="width:30%; height:auto;">
+
+"START/RESET" - Запуск и пауза замера, долгое удержание - сброс  
+"U+" и "U-" - настройка минимального напряжения разряд  
 
 ## Схема
 
-![pic](pics/sch.jpg)
+<img src="pics/sch.jpg" alt="interface" style="width:90%; height:auto;">
 
 ## Настройки
 
