@@ -6,6 +6,7 @@
 #include "ButtonFF.h"
 
 #define FW_VER "1.0"
+#define NO_LOAD 11111
 
 #define BUZZER 14
 #define MOSFET 0
@@ -52,7 +53,7 @@ float voltage = 0;
 float end_voltage = 3.1;
 float current = 0;
 float power = 0;
-float watthour = 0;
+float energy = 0;
 uint16_t load = 0;
 } battery;
 
@@ -126,7 +127,7 @@ void button_handler() {
     if(start_rst.hold()) {
         time.sec = time.min = time.hour = 0;
         battery.capacity = 0;
-        battery.watthour = 0;
+        battery.energy = 0;
         load_off();
     }
     if(U_inc.release()) {
@@ -150,7 +151,7 @@ void draw_text() {
     oled.print(F("Capacity:"));
     //string 2
     oled.setCursor(0, 2);
-    oled.print(F("WtHour:"));
+    oled.print(F("Energy:"));
     //string 3
     oled.setCursor(0, 3);
     oled.print(F("Voltage:"));
@@ -189,7 +190,7 @@ void draw_values() {
     oled.print(F(" mAh "));
     //string 2
     oled.setCursor(x_start, 2);
-    oled.print(battery.watthour, 2);
+    oled.print(battery.energy, 2);
     oled.print(F(" Wh "));
     //string 3
     oled.setCursor(x_start, 3);
@@ -205,7 +206,7 @@ void draw_values() {
     oled.print(F(" A "));
     //string 6
     oled.setCursor(x_start, 6);
-    if(battery.load >= 10000) oled.print(F("NO LOAD  "));
+    if(battery.load >= NO_LOAD) oled.print(F("NO LOAD  "));
     else {
         if(battery.load < 1000) oled.print(" ");
         if(battery.load < 100) oled.print(" ");
@@ -228,7 +229,7 @@ void bootup_screen() {
     oled.print(F("Battery Tester"));
     //oled.setScale(1);
     oled.setCursor(0, 7);
-    oled.print(F("BetaFF         v: "));
+    oled.print(F("BetaFF           v"));
     oled.print(F(FW_VER));
     delay(2000);
     oled.clearDisplay();
@@ -270,6 +271,7 @@ void setup() {
     ina.begin();
     ina.setResolution(INA219_VBUS, INA219_RES_12BIT_X8);      // Напряжение в 12ти битном режиме + 8х кратное усреднение
     ina.setResolution(INA219_VSHUNT, INA219_RES_12BIT_X64);  // Ток в 12ти битном режиме + 64х кратное усреднение
+    Wire.setClock(400000);
 
     draw_text();
 }
@@ -280,11 +282,12 @@ void loop() {
         button_handler();
     }
     if(task100ms.ready()) {
-        battery.voltage = ina.getVoltage();
-        battery.current = constrain(ina.getCurrent(), 0, 100);
-        battery.power = ina.getPower();
+        battery.voltage = ina.getVoltage() + 0.04; // + 0.04 - моя INA врет
+        battery.current = constrain(ina.getCurrent() * 0.95, 0, 100); // * 0.95 - моя INA врет 
+        //battery.power = ina.getPower();
+        battery.power = battery.voltage * battery.current;
         if(battery.current != 0.0) battery.load = (uint16_t)(battery.voltage / battery.current);
-        else battery.load = 11111;
+        else battery.load = NO_LOAD;
         draw_values();
         if(mode == work && (battery.voltage < battery.end_voltage)) {
             load_off();
@@ -295,7 +298,7 @@ void loop() {
         time_handler();
         if(mode == work){
             battery.capacity += (battery.current * task1000ms.getPeriod() / 3600); //расчет емкости АКБ в мАч
-            battery.watthour += battery.power * task1000ms.getPeriod() / 3600000; //расчет емкости АКБ в ВтЧ
+            battery.energy += battery.power * task1000ms.getPeriod() / 3600000; //расчет емкости АКБ в ВтЧ
         }
         if(oled_off == false) oled_off_cnt++;
         if(oled_off_cnt > 60 * 2) oled_turn_off(); // 2 минуты

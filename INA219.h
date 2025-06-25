@@ -124,6 +124,11 @@ class INA219 {
         return (value >> 3) * 0.004f;                         // LSB = 4mV = 0.004V, Сдвигаем значение до 12 бит и умножаем
     }
 
+    uint16_t getVoltageRaw(void) {
+        uint16_t value = readRegister(INA219_VBUS_REG_ADDR);  // Сырое чтение регистра напряжения
+        return value >> 3;
+    }
+
     // Чтение тока
     float getCurrent(void) {
         setCalibration(_cal_value);                         // Принудительное обновление калибровки (на случай внезапного ребута INA219)
